@@ -5,7 +5,7 @@ import model.nave.Parte;
 
 public class Tabuleiro {
 
-    private Parte[][] matriz; //talvez mudar o tipo pra algo melhor
+    private Parte[][] matriz; //talvez mudar o tipo pra algo melhorr
     
     @PostConstruct
     private void initMatriz() {
