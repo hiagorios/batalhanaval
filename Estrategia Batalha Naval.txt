@@ -1,0 +1,28 @@
+* Navios Total (Tp = 35p de 100p):
+	- [1] Porta Aviões 	(5p * 1 =  5p)
+		PPPPP
+	- [2] Cruzadores 	(4p * 2 =  8p)
+		CCCC
+	- [3] Destroyers 	(2p * 3 =  6p)
+		DD
+	- [4] Submarinos 	(1p * 4 =  4p)
+		S
+	- [4] Água-vião		(3p * 4 = 12p)
+		  H
+		 H H
+		
+1) Colocar Navios:
+	1.1) Colocar Água-viões primeiro (Eles são piores para colocar)
+	1.2) Colocar os maiores depois:	Porta -> Cruza -> Dest -> Sub
+	(!!) Ao prencher os navios, prencher os adjacentes a ele
+	
+	[RESTRIÇÃO] -> Espaço ao redor (quadrado) não pode conter outro navio
+		   -III-
+		   IIHII		
+	 	   IHIHI
+		   IIIII
+2) Disparos:
+	2.1) Modo Busca:
+		
+	2.2) Modo caça:
+		

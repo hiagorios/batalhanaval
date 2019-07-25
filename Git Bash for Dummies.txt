@@ -1,0 +1,12 @@
+1) cd to the Git folder
+2) Do stuff:
+	Get:
+		> git clone					(clona tudo do master)
+	Update:
+		> git pull					(puxa as novidades)
+	Send (Na ordem):
+		> git add . 				(marca todas as MUDANÇAS para o commit)
+		> git commit -m "<texto>"	(fecha o pacote e prepara para envio)	
+		> git push 					(envia os commits para o master)	
+	Status:
+		> git status				(puxa o status da pasta local)
