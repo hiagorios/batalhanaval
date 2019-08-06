@@ -7,11 +7,11 @@ public class Square
 {
     public enum SquareState
     {
-        BLANK,  //Nothing on this Square, available to hit
-        FILLED, //The is a ship piece here
+        BLANK,  //Nothing on this Square, available to shoot
+        FILLED, //There is a ship piece here
         IMP,    //Impossible. Belongs to a ship's radius
         WATER,  //Shot on water, can't mark again
-        HIT     //Shot hit a ship, can't shot here again
+        HIT     //Shot hit a ship, can't shoot here again
     }
     
     private SquareState m_state;
