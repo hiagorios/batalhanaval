@@ -7,14 +7,19 @@ public class Square
 {
     public enum SquareState
     {
-        BLANK,  //Nothing on this Square, available to shoot
-        FILLED, //There is a ship piece here
-        IMP,    //Impossible. Belongs to a ship's radius
-        WATER,  //Shot on water, can't mark again
-        HIT     //Shot hit a ship, can't shoot here again
+        BLANK,      //Nothing on this Square, available to shoot
+        FILLED,     //There is a ship piece here
+        IMP,        //Impossible. Belongs to a ship's radius
+        WATER,      //Shot on water, can't mark again
+        HIT_SUB,    //Shot hit a Submarino
+        HIT_DES,    //Shot hit a Destroyers
+        HIT_CRU,    //Shot hit a Cruzador
+        HIT_HID,    //Shot hit a Hidro viao
+        HIT_PP,     //Shot hit a Porta Plane
     }
     
     private SquareState m_state;
+    private float m_weight;
     private final char m_column;
     private final char m_row;
     
@@ -30,8 +35,18 @@ public class Square
         m_row = s.GetRow();
         m_column = s.GetColumn();
     }
+
+    public float getWeight()
+    {
+        return m_weight;
+    }
+
+    public void setWeight(float m_weight)
+    {
+        this.m_weight = m_weight;
+    }
     
-    void SetState(SquareState state)
+    void setState(SquareState state)
     {
         m_state = state;
     }   
@@ -67,7 +82,11 @@ public class Square
             case WATER:
                 System.out.printf("[WW]");
                 break;
-            case HIT:
+            case HIT_DES:
+            case HIT_HID:
+            case HIT_CRU:
+            case HIT_SUB:
+            case HIT_PP:
                 System.out.printf("[XX]");
                 break;
             case IMP:
