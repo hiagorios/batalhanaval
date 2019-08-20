@@ -1,5 +1,7 @@
 package model.nave;
 
+import model.Square;
+
 public class Cruzador extends Nave {
 
     public Cruzador() {
@@ -15,5 +17,10 @@ public class Cruzador extends Nave {
     @Override
     public void destroyedMessage() {
         System.out.println("Cruzador destruído!");
+    }
+    
+    @Override
+    public void markGrid(Square[][] grid){
+        
     }
 }

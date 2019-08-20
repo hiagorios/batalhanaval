@@ -3,10 +3,8 @@ package model;
 /**
  * @author Ramon
  */
-public class Square
-{
-    public enum SquareState
-    {
+public class Square {
+    public enum SquareState{
         BLANK,      //Nothing on this Square, available to shoot
         FILLED,     //There is a ship piece here
         IMP,        //Impossible. Belongs to a ship's radius
@@ -23,34 +21,29 @@ public class Square
     private final char m_column;
     private final char m_row;
     
-    Square(char r, char c)
-    {
+    Square(char r, char c){
         m_state = SquareState.BLANK;
         m_row = r;
         m_column = c;
         m_weight = 0;
     }
-    Square(char r, char c, double w)
-    {
+    Square(char r, char c, double w){
         m_state = SquareState.BLANK;
         m_row = r;
         m_column = c;
         m_weight = w;
     }
-    Square(Square s)
-    {
-        m_state = s.GetState();
-        m_row = s.GetRow();
-        m_column = s.GetColumn();
+    Square(Square s){
+        m_state = s.getState();
+        m_row = s.getRow();
+        m_column = s.getColumn();
     }
 
-    public double getWeight()
-    {
+    public double getWeight(){
         return m_weight;
     }
 
-    public void setWeight(double w)
-    {
+    public void setWeight(double w){
         m_weight = w;
     }
     
@@ -61,39 +54,95 @@ public class Square
         }
     }
     
-    void setState(SquareState state)
-    {
+    void setState(SquareState state){
         m_state = state;
     }   
-    SquareState GetState()
-    {
+    SquareState getState(){
         return m_state;
     }
     
-    char GetRow()
-    {
+    char getRow(){
         return m_row;
     }
     
-    int GetRowIndex()
-    {
+    int getRowIndex(){
         return m_row - 'A';
     }
     
-    char GetColumn()
-    {
+    char getColumn(){
         return m_column;
     }
     
-    int GetColumnIndex()
-    {
+    boolean isCornerLeft(){
+        return m_column == '0';
+    }
+    
+    boolean isCornerRight(){
+        return m_column == '9';
+    }
+    
+    boolean isCornerTop(){
+        return m_column == 'A';
+    }
+    
+    boolean isCornerBottom(){
+        return m_row == 'J';
+    }
+    
+    int getIndexRight(){
+        if(isCornerRight()){
+            return  -1;
+        }
+        return getColumnIndex() + 1;
+    }
+    
+    int getIndexLeft(){
+        if(isCornerLeft()){
+            return  -1;
+        }
+        return getColumnIndex() - 1;
+    }
+    
+    int getIndexTop(){
+        if(isCornerTop()){
+            return  -1;
+        }
+        return getRowIndex() - 1;
+    }
+    
+    int getIndexBottom(){
+        if(isCornerBottom()){
+            return  -1;
+        }
+        return getRowIndex() + 1;
+    }
+    
+    int assumeShipSize(){
+        switch(m_state){
+            case WATER:
+            case BLANK:
+            case IMP:
+            default:
+                return 0;
+            case HIT_DES:
+                return 2;
+            case HIT_HID:
+                return 3;
+            case HIT_CRU:
+                return 4;
+            case HIT_SUB:
+                return 1;
+            case HIT_PP:
+                return 5;
+        }
+    }
+    
+    int getColumnIndex(){
         return m_column - '0';
     }
     
-    void print()
-    {
-        switch (m_state)
-        {
+    void print(){
+        switch (m_state){
             case WATER:
                 System.out.printf("[WWW]");
                 break;

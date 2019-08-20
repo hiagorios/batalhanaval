@@ -1,4 +1,5 @@
 package model.nave;
+import model.Square;
 
 public class Hidroaviao extends Nave {
 
@@ -15,5 +16,10 @@ public class Hidroaviao extends Nave {
     @Override
     public void destroyedMessage() {
         System.out.println("Hidroavião destruído!");
+    }
+    
+    @Override
+    public void markGrid(Square[][] grid){
+        
     }
 }

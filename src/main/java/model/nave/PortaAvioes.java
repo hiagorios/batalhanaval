@@ -1,5 +1,7 @@
 package model.nave;
 
+import model.Square;
+
 public class PortaAvioes extends Nave {
 
     public PortaAvioes() {
@@ -18,4 +20,8 @@ public class PortaAvioes extends Nave {
         System.out.println("Porta-aviões destruído!");
     }
     
+    @Override
+    public void markGrid(Square[][] grid){
+
+    }
 }
