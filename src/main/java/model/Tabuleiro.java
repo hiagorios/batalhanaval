@@ -17,13 +17,6 @@ public class Tabuleiro {
 
     public Tabuleiro() {
         reader = new Scanner(System.in);
-    }
-
-    /**
-     * Initializes the matrix and the shotGrid
-     */
-    @PostConstruct
-    private void initGrids() {
         matriz = new Square[10][10];
         shotGrid = new ArrayList<>();
         fillGrid = new ArrayList<>();
@@ -32,11 +25,20 @@ public class Tabuleiro {
             fillGrid.add(new ArrayList<>());
             for (int j = 0; j < 10; j++) {
                 char row = (char) ('A' + j), column = (char) ('0' + i);
-                matriz[i][j] = new Square(row, column);
+                //Initialize the grid giving the center more weight than the corners
+                matriz[i][j] = new Square(row, column, (float)(5 - Math.abs(i - 4) +  5 - Math.abs(j - 4)) / 10);
                 shotGrid.get(i).add(new Square(matriz[i][j]));
                 fillGrid.get(i).add(new Square(matriz[i][j]));
             }
         }
+    }
+
+    /**
+     * Initializes the matrix and the shotGrid
+     */
+    @PostConstruct
+    private void initGrids() {
+        
     }
 
     /**
@@ -58,19 +60,37 @@ public class Tabuleiro {
     }
     
     public void updateProbs(Square[][] showGrid, Square sqs, boolean destroyed){
-        sqs.setWeight(0);
-        if(destroyed){ //Back to normal firing mode
+        if(destroyed){ //Back to normal firing mode, but before that, mark all squares around AND the ship sunk with 0 weight 
             
         }
         else{
-            
+            switch(sqs.GetState()){
+                case HIT_SUB:
+                    break;
+                case HIT_HID:
+                    break;
+                case HIT_CRU:
+                    break;
+                case HIT_DES:
+                    break;
+                case HIT_PP:
+                    break;
+                case WATER: //Hit water: Reduce weight in cardinal directions from this square
+                    for(int i = 0; i < 10; i++) {
+                        showGrid[i][sqs.GetColumnIndex()].incrementWeight(-0.1);
+                    }
+                    for(int i = 0; i < 10; i++) {
+                        showGrid[sqs.GetRowIndex()][i].incrementWeight(-0.1);
+                    }
+                    break;
+            }
         }
-        
+        sqs.setWeight(0);
     }
 
     public void shotHunt(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid){
         ArrayList<Square> probs = new ArrayList<>();
-        float maxProb = 0;
+        double maxProb = 0;
         int randShot = 0;
         Square selectedSquare = null;
         for(int i = 0; i < 10; i++){
@@ -160,10 +180,10 @@ public class Tabuleiro {
      *
      * @param grid The grid itself
      */
-    public void printMatriz(Square[][] grid) {
+    public void printMatriz() {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                grid[i][j].print();
+                matriz[i][j].print();
             }
             System.out.print('\n');
         }

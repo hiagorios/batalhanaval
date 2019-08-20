@@ -19,7 +19,7 @@ public class Square
     }
     
     private SquareState m_state;
-    private float m_weight;
+    private double m_weight;
     private final char m_column;
     private final char m_row;
     
@@ -28,6 +28,14 @@ public class Square
         m_state = SquareState.BLANK;
         m_row = r;
         m_column = c;
+        m_weight = 0;
+    }
+    Square(char r, char c, double w)
+    {
+        m_state = SquareState.BLANK;
+        m_row = r;
+        m_column = c;
+        m_weight = w;
     }
     Square(Square s)
     {
@@ -36,14 +44,21 @@ public class Square
         m_column = s.GetColumn();
     }
 
-    public float getWeight()
+    public double getWeight()
     {
         return m_weight;
     }
 
-    public void setWeight(float m_weight)
+    public void setWeight(double w)
     {
-        this.m_weight = m_weight;
+        m_weight = w;
+    }
+    
+    public void incrementWeight(double val){
+        m_weight += val;
+        if(m_weight < 0){
+            m_weight = 0;
+        }
     }
     
     void setState(SquareState state)
@@ -80,21 +95,29 @@ public class Square
         switch (m_state)
         {
             case WATER:
-                System.out.printf("[WW]");
+                System.out.printf("[WWW]");
                 break;
             case HIT_DES:
+                System.out.printf("[DDD]");
+                break;
             case HIT_HID:
+                System.out.printf("[HID]");
+                break;
             case HIT_CRU:
+                System.out.printf("[CRU]");
+                break;
             case HIT_SUB:
+                System.out.printf("[SUB]");
+                break;
             case HIT_PP:
-                System.out.printf("[XX]");
+                System.out.printf("[PPA]");
                 break;
             case IMP:
-                System.out.printf("[**]");
+                System.out.printf("[***]");
                 break;
             case BLANK:
             default:
-                System.out.printf("[%c%c]", m_row, m_column);
+                System.out.printf("[%.2f]", m_weight);
                 break;
         }
     }
