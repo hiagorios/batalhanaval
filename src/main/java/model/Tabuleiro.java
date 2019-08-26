@@ -6,33 +6,52 @@ import java.util.Scanner;
 
 public class Tabuleiro {
 
+    private int turnCounter = 0;
+    private int shipsLeft = 14;
     private Scanner reader;
     //Matriz de todas as posicoes
     private Square[][] matriz;
     //Matriz de possibilidades de disparo. Todos os itens da lista sao locais validos para atirar
-    private ArrayList<ArrayList<Square>> shotGrid;
+    //private ArrayList<ArrayList<Square>> shotGrid;
     //Matriz de possibilidades para prenchimento. Todos os itens da lista sao locais validos para colocar navios
-    private ArrayList<ArrayList<Square>> fillGrid;
+    //private ArrayList<ArrayList<Square>> fillGrid;
     //Lista contendo as partes do navio que está sendo caçado no momento
     private ArrayList<Square> navioCacado;
 
     public Tabuleiro() {
         reader = new Scanner(System.in);
         matriz = new Square[10][10];
-        shotGrid = new ArrayList<>();
-        fillGrid = new ArrayList<>();
+//        shotGrid = new ArrayList<>();
+//        fillGrid = new ArrayList<>();
         navioCacado = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            shotGrid.add(new ArrayList<>());
-            fillGrid.add(new ArrayList<>());
+//            shotGrid.add(new ArrayList<>());
+//            fillGrid.add(new ArrayList<>());
             for (int j = 0; j < 10; j++) {
-                char row = (char) ('A' + j), column = (char) ('0' + i);
+                char row = (char) ('A' + i), column = (char) ('0' + j);
+                float iVal = 0, jVal = 0;
                 //Initialize the grid giving the center more weight than the corners
-                matriz[i][j] = new Square(row, column, (float) (5 - Math.abs(i - 4) + 5 - Math.abs(j - 4)) / 10);
-                shotGrid.get(i).add(new Square(matriz[i][j]));
-                fillGrid.get(i).add(new Square(matriz[i][j]));
+                if(i <= 4){
+                  iVal = (float)(i + 1)  / 10;
+                }
+                else{
+                  iVal = (float)(10 - i)  / 10;  
+                }
+                if(j <= 4){
+                  jVal = (float)(j + 1)  / 10;    
+                }
+                else{
+                  jVal = (float)(10 - j)  / 10;  
+                }
+                matriz[i][j] = new Square(row, column, iVal + jVal);
+//                shotGrid.get(i).add(new Square(matriz[i][j]));
+//                fillGrid.get(i).add(new Square(matriz[i][j]));
             }
         }
+        while(shipsLeft > 0){
+            shotHunt(matriz);
+        }
+        printMatriz();
     }
 
     /**
@@ -44,8 +63,73 @@ public class Tabuleiro {
         Random rand = new Random();
         int iDex = rand.nextInt(grid.size());
         int jDex = rand.nextInt(grid.get(iDex).size());
-
+        //Easter Egg: (spotify:playlist:3wdULViYimfI44KZM4Yjz0)
         return new Square(grid.get(iDex).get(jDex).getRow(), grid.get(iDex).get(jDex).getColumn());
+    }
+    
+    
+    public void setSquareLeft(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+        if(!tgt.isCornerLeft() && tgt.getWeight() != 0){
+            matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setState(state);
+            matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setOrient(orient);
+            matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareRight(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+        if(!tgt.isCornerRight() && tgt.getWeight() != 0){
+            matriz[tgt.getRowIndex()][tgt.getIndexRight()].setState(state);
+            matriz[tgt.getRowIndex()][tgt.getIndexRight()].setOrient(orient);
+            matriz[tgt.getRowIndex()][tgt.getIndexRight()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareTop(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+        if(!tgt.isCornerTop() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setState(state);
+            matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setOrient(orient);
+            matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareBottom(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+        if(!tgt.isCornerBottom() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setState(state);
+            matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setOrient(orient);
+            matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareTL(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+        if(tgt.haveDiagonalTL() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setState(state);
+            matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setOrient(orient);
+            matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareTR(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+         if(tgt.haveDiagonalTR() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexTop()][tgt.getIndexRight()].setState(state);
+            matriz[tgt.getIndexTop()][tgt.getIndexRight()].setOrient(orient);
+            matriz[tgt.getIndexTop()][tgt.getIndexRight()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareBL(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+         if(tgt.haveDiagonalBL() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setState(state);
+            matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setOrient(orient);
+            matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setWeight(weight);
+        }
+    }
+    
+    public void setSquareBR(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
+         if(tgt.haveDiagonalBR() && tgt.getWeight() != 0){
+            matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setState(state);
+            matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setOrient(orient);
+            matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setWeight(weight);
+        }
     }
 
     /**
@@ -57,8 +141,8 @@ public class Tabuleiro {
      */
     public ArrayList<Square> vizinhos(Square sqs, boolean cardinaisOnly) {
         ArrayList<Square> nei = new ArrayList<>();
-        boolean left = sqs.getIndexLeft() > 0, right = sqs.getIndexRight() > 0;
-        boolean bottom = sqs.getIndexLeft() > 0, top = sqs.getIndexTop() > 0;
+        boolean left = !sqs.isCornerLeft(), right = !sqs.isCornerRight();
+        boolean bottom = !sqs.isCornerBottom(), top = !sqs.isCornerTop();
         int curC = sqs.getColumnIndex(), curR = sqs.getRowIndex();
         if (top) {
             nei.add(matriz[curR - 1][curC]);
@@ -106,10 +190,26 @@ public class Tabuleiro {
             }
         }
         for (Square nei : neighbors) {
-            nei.setWeight(0);
+            //nei.setWeight(0);
+            nei.setState(Square.SquareState.WATER);
         }
+        shipsLeft--;
+        navioCacado.clear();
     }
 
+    //All Ships:
+    //     [0]     |    [1]   OR   [1]   
+    //      ?      |     ?               
+    //      ?      |     X          W    
+    //    ??X??    |     X        ??X??  
+    //      ?      |     ?               
+    //      ?      |     ?               
+    //Hidro-Plane:
+    //     [0]   |    [1]   OR   [1]   |   [2]   OR   [2]   OR   [2]
+    //    ?   ?  |   ?   X      ?   W  |  X   X      X   W      W   W
+    //      X    |     X          X    |    X          X          X
+    //    ?   ?  |       ?      ?   ?  |             O          O   O
+    // [?] -> Possible | [X] -> Hit | [W] -> Water | [O] -> Next part (100%)
     /**
      * Updates the probability of the grid, depending on the success of the
      * current shot
@@ -125,20 +225,68 @@ public class Tabuleiro {
         } else {
             ArrayList<Square> neighbors = vizinhos(sqs, true);
             switch (sqs.getState()) {
-                case HIT_HID: //special case
-                    break;
-                case WATER: //Hit water: Reduce weight in cardinal directions from this square
-                    for (int i = 0; i < 10; i++) {
-                        showGrid[i][sqs.getColumnIndex()].incrementWeight(-0.1);
+                case HIT_HID:   //Special case
+                    if(sqs.haveDiagonalBL()){
+                        showGrid[sqs.getIndexBottom()][sqs.getIndexLeft()].setWeight(2);
                     }
-                    for (int i = 0; i < 10; i++) {
-                        showGrid[sqs.getRowIndex()][i].incrementWeight(-0.1);
+                    if(sqs.haveDiagonalBR()){
+                        showGrid[sqs.getIndexBottom()][sqs.getIndexRight()].setWeight(2);
+                    }
+                    if(sqs.haveDiagonalTL()){
+                        showGrid[sqs.getIndexTop()][sqs.getIndexLeft()].setWeight(2);
+                    }
+                    if(sqs.haveDiagonalTR()){
+                        showGrid[sqs.getIndexTop()][sqs.getIndexRight()].setWeight(2);
                     }
                     break;
-                default: // it's not a hidro viao, nor water nor a submarine (because submarines are always fully destroyed)
-                    for (Square nei : neighbors) {
-                        if (nei.getWeight() != 0) {
-                            nei.setWeight(2);
+                case WATER:     //Hit water: Do facking nothing
+                    for(int i = 0; i < 10; i++){
+                        matriz[i][sqs.getColumnIndex()].incrementWeight(-0.01);
+                    }
+                    for(int j = 0; j < 10; j++){
+                        matriz[sqs.getRowIndex()][j].incrementWeight(-0.01);
+                    }
+                    break;
+                default:        //It's not a hidro viao, nor water nor a submarine (because submarines are always fully destroyed)
+                    if(navioCacado.size() >= 1){ //If size is greater or equal to 1, we can assume it's orientation
+                        int dex = navioCacado.size() - 1;
+                        Square lastHit = navioCacado.get(dex);
+                        //Check where the last ship was in relation to 'sqs'
+                        if(lastHit.isSquareOver(sqs) || lastHit.isSquareUnder(sqs)){
+                            sqs.setOrient(Square.ShipOrient.VERT);
+                            //Set left and right as zero, since the ship can't be here anyways
+                            setSquareLeft(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            setSquareRight(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            //If size is one, we need to fix our first wrong guess
+                            if(navioCacado.size() == 1){
+                                setSquareLeft(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                                setSquareRight(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            }
+                        }
+                        else {
+                            sqs.setOrient(Square.ShipOrient.HORI);
+                            setSquareTop(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            setSquareBottom(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            if(navioCacado.size() == 1){
+                                setSquareTop(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                                setSquareBottom(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+                            }
+                        }
+                    }
+                    if(sqs.getOrient() == Square.ShipOrient.VERT || sqs.getOrient() == Square.ShipOrient.UNKW) {
+                        if(!sqs.isCornerBottom()){
+                            showGrid[sqs.getIndexBottom()][sqs.getColumnIndex()].setWeight(2);
+                        }
+                        if(!sqs.isCornerTop()){
+                            showGrid[sqs.getIndexTop()][sqs.getColumnIndex()].setWeight(2);
+                        }   
+                    }
+                    if(sqs.getOrient() == Square.ShipOrient.HORI || sqs.getOrient() == Square.ShipOrient.UNKW) {
+                        if(!sqs.isCornerLeft()){
+                            showGrid[sqs.getRowIndex()][sqs.getIndexLeft()].setWeight(2);
+                        }
+                        if(!sqs.isCornerRight()){
+                            showGrid[sqs.getRowIndex()][sqs.getIndexRight()].setWeight(2);
                         }
                     }
             }
@@ -153,7 +301,7 @@ public class Tabuleiro {
      * @param fireGrid All possible firing squares (Currently unused)
      * @param showGrid The grid itself
      */
-    public void shotHunt(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid) {
+    public void shotHunt(Square[][] showGrid) {
         ArrayList<Square> probs = new ArrayList<>();
         double maxProb = 0;
         int randShot = 0;
@@ -175,6 +323,7 @@ public class Tabuleiro {
         if (probs.size() > 1) {
             randShot = (int) (Math.random() * (probs.size() - 1));
         }
+        printMatriz();
         selectedSquare = probs.get(randShot);
         //W - Water
         //C - Cuzer
@@ -211,17 +360,17 @@ public class Tabuleiro {
                 navioCacado.add(selectedSquare);
                 break;
         }
-        if (in.charAt(1) == 'T') {
+        if (in.length() > 1 && in.charAt(1) == 'T') {
             //TODO: Codigo para remover da lista o navio em 'selectedSquare'
             updateProbs(showGrid, selectedSquare, true);
         } else {
             updateProbs(showGrid, selectedSquare, false);
         }
 
-        fireGrid.get(selectedSquare.getRowIndex()).remove(selectedSquare.getColumnIndex());
-        if (fireGrid.get(selectedSquare.getRowIndex()).isEmpty()) {
-            fireGrid.remove(selectedSquare.getRowIndex());
-        }
+//        fireGrid.get(selectedSquare.getRowIndex()).remove(selectedSquare.getColumnIndex());
+//        if (fireGrid.get(selectedSquare.getRowIndex()).isEmpty()) {
+//            fireGrid.remove(selectedSquare.getRowIndex());
+//        }
     }
 
     /**
@@ -231,32 +380,40 @@ public class Tabuleiro {
      * @param fireGrid The grid in which the shots will be stored
      * @param showGrid The grid used to visualization
      */
-    public void shot(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid) {
-        Random rand = new Random();
-        int iDex = rand.nextInt(fireGrid.size());
-        int jDex = rand.nextInt(fireGrid.get(iDex).size());
-        int i = fireGrid.get(iDex).get(jDex).getRowIndex();     //Actual 'i' of 'matriz'
-        int j = fireGrid.get(iDex).get(jDex).getColumnIndex();  //Actual 'j' of 'matriz'
-
-        //Hit checking code will go here
-        showGrid[i][j].setState(Square.SquareState.WATER);
-        fireGrid.get(iDex).remove(jDex);
-        if (fireGrid.get(iDex).isEmpty()) {
-            fireGrid.remove(iDex);
-        }
-    }
+//    public void shot(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid) {
+//        Random rand = new Random();
+//        int iDex = rand.nextInt(fireGrid.size());
+//        int jDex = rand.nextInt(fireGrid.get(iDex).size());
+//        int i = fireGrid.get(iDex).get(jDex).getRowIndex();     //Actual 'i' of 'matriz'
+//        int j = fireGrid.get(iDex).get(jDex).getColumnIndex();  //Actual 'j' of 'matriz'
+//
+//        //Hit checking code will go here
+//        showGrid[i][j].setState(Square.SquareState.WATER);
+//        fireGrid.get(iDex).remove(jDex);
+//        if (fireGrid.get(iDex).isEmpty()) {
+//            fireGrid.remove(iDex);
+//        }
+//    }
 
     /**
      * Prints the grid passed as parameter
      *
      */
     public void printMatriz() {
+        System.out.printf("   ");
+        for(int i = 0; i < 10; i++){
+            System.out.printf("   [%c]  ", '0' + i);
+        }
+        System.out.printf("\n");
         for (int i = 0; i < 10; i++) {
+            System.out.printf("[%c]", 'A' + i);
             for (int j = 0; j < 10; j++) {
                 matriz[i][j].print();
             }
             System.out.print('\n');
         }
+        System.out.printf("Turn      : %2d\n", ++turnCounter);
+        System.out.printf("Ships Left: %2d\n", shipsLeft);
     }
 
     public Square[][] getMatriz() {
@@ -267,19 +424,19 @@ public class Tabuleiro {
         this.matriz = matriz;
     }
 
-    public ArrayList<ArrayList<Square>> getShotGrid() {
-        return shotGrid;
-    }
-
-    public void setShotGrid(ArrayList<ArrayList<Square>> shotGrid) {
-        this.shotGrid = shotGrid;
-    }
-
-    public ArrayList<ArrayList<Square>> getFillGrid() {
-        return fillGrid;
-    }
-
-    public void setFillGrid(ArrayList<ArrayList<Square>> fillGrid) {
-        this.fillGrid = fillGrid;
-    }
+//    public ArrayList<ArrayList<Square>> getShotGrid() {
+//        return shotGrid;
+//    }
+//
+//    public void setShotGrid(ArrayList<ArrayList<Square>> shotGrid) {
+//        this.shotGrid = shotGrid;
+//    }
+//
+//    public ArrayList<ArrayList<Square>> getFillGrid() {
+//        return fillGrid;
+//    }
+//
+//    public void setFillGrid(ArrayList<ArrayList<Square>> fillGrid) {
+//        this.fillGrid = fillGrid;
+//    }
 }

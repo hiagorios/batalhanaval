@@ -11,7 +11,6 @@ public class BattleShips {
         game.distribuirNavios(tabuleiro);
         // verificar quem comeca atirando
         tabuleiro.printMatriz();
-        game.run();
     }
 
     public void distribuirNavios(Tabuleiro tabuleiro) {
