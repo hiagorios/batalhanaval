@@ -43,5 +43,13 @@ public abstract class Nave {
     public void setLetra(char letra) {
         this.letra = letra;
     }
+
+    public int getDesState() {
+        return desState;
+    }
+
+    public void setDesState(int desState) {
+        this.desState = desState;
+    }
     
 }

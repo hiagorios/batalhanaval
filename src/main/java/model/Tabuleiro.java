@@ -1,6 +1,5 @@
 package model;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -14,31 +13,26 @@ public class Tabuleiro {
     private ArrayList<ArrayList<Square>> shotGrid;
     //Matriz de possibilidades para prenchimento. Todos os itens da lista sao locais validos para colocar navios
     private ArrayList<ArrayList<Square>> fillGrid;
+    //Lista contendo as partes do navio que está sendo caçado no momento
+    private ArrayList<Square> navioCacado;
 
     public Tabuleiro() {
         reader = new Scanner(System.in);
         matriz = new Square[10][10];
         shotGrid = new ArrayList<>();
         fillGrid = new ArrayList<>();
+        navioCacado = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             shotGrid.add(new ArrayList<>());
             fillGrid.add(new ArrayList<>());
             for (int j = 0; j < 10; j++) {
                 char row = (char) ('A' + j), column = (char) ('0' + i);
                 //Initialize the grid giving the center more weight than the corners
-                matriz[i][j] = new Square(row, column, (float)(5 - Math.abs(i - 4) +  5 - Math.abs(j - 4)) / 10);
+                matriz[i][j] = new Square(row, column, (float) (5 - Math.abs(i - 4) + 5 - Math.abs(j - 4)) / 10);
                 shotGrid.get(i).add(new Square(matriz[i][j]));
                 fillGrid.get(i).add(new Square(matriz[i][j]));
             }
         }
-    }
-
-    /**
-     * Initializes the matrix and the shotGrid
-     */
-    @PostConstruct
-    private void initGrids() {
-        
     }
 
     /**
@@ -53,124 +47,133 @@ public class Tabuleiro {
 
         return new Square(grid.get(iDex).get(jDex).getRow(), grid.get(iDex).get(jDex).getColumn());
     }
-    
-    public ArrayList<Square> vizinhos(Square sqs){
+
+    /**
+     * Create and return a list of the neighbors of the passed square
+     *
+     * @param sqs
+     * @param cardinaisOnly
+     * @return a list containing the neighbors of sqs
+     */
+    public ArrayList<Square> vizinhos(Square sqs, boolean cardinaisOnly) {
         ArrayList<Square> nei = new ArrayList<>();
         boolean left = sqs.getIndexLeft() > 0, right = sqs.getIndexRight() > 0;
         boolean bottom = sqs.getIndexLeft() > 0, top = sqs.getIndexTop() > 0;
         int curC = sqs.getColumnIndex(), curR = sqs.getRowIndex();
-        if(top){
+        if (top) {
             nei.add(matriz[curR - 1][curC]);
         }
-        if(left){    
+        if (left) {
             nei.add(matriz[curR][curC - 1]);
         }
-        if(right){
+        if (right) {
             nei.add(matriz[curR][curC + 1]);
         }
-        if(bottom){
+        if (bottom) {
             nei.add(matriz[curR + 1][curC]);
         }
-        if(bottom && left){
-            nei.add(matriz[curR + 1][curC - 1]);
-        }
-        if(bottom && right){
-            nei.add(matriz[curR + 1][curC + 1]);
-        }
-        if(top && left){
-            nei.add(matriz[curR - 1][curC - 1]);
-        }
-        if(top && right){
-            nei.add(matriz[curR - 1][curC + 1]);
+        if (!cardinaisOnly) {
+            if (bottom && left) {
+                nei.add(matriz[curR + 1][curC - 1]);
+            }
+            if (bottom && right) {
+                nei.add(matriz[curR + 1][curC + 1]);
+            }
+            if (top && left) {
+                nei.add(matriz[curR - 1][curC - 1]);
+            }
+            if (top && right) {
+                nei.add(matriz[curR - 1][curC + 1]);
+            }
         }
         return nei;
     }
-    
+
     /**
-     * Mark all squares around a destroyed ship with weigth zero, so we don't fire there again
+     * Mark all squares around a destroyed ship with weight zero, so we don't
+     * fire there again
+     *
      * @param showGrid The grid itself
      * @param sqs The last fired shot. Special case if it was a Hidro Viao
      */
-    public void markGridZero(Square[][] showGrid, Square sqs){
-        int marks = sqs.assumeShipSize();
-        ArrayList<Square> nei;
-        if(sqs.getState() == Square.SquareState.HIT_HID){
-            //Special Case: Search and mark on a 'X' shape
-            while(marks > 0){
-                nei = vizinhos(sqs);
-                for(int i = 0; i < nei.size(); i++){
-                    nei.get(i).setWeight(0);
+    public void markGridZero(Square[][] showGrid, Square sqs) {
+        ArrayList<Square> neighbors = new ArrayList<>();
+        for (Square parte : navioCacado) {
+            for (Square nei : vizinhos(parte, false)) {
+                if (!neighbors.contains(nei)) {
+                    neighbors.add(nei);
                 }
-                marks--;
-                //Now we need to find the next! Check two spaces to each sideS
             }
         }
-        else {
-            //Commom Case: Search in a straight line, 'n' times, 'n' dependant of the ship length
+        for (Square nei : neighbors) {
+            nei.setWeight(0);
         }
     }
-    
+
     /**
-     * Updates the probability of the grid, depeding on the success of the current shot
+     * Updates the probability of the grid, depending on the success of the
+     * current shot
+     *
      * @param showGrid The grid itself
      * @param sqs The last fired shot. Special case if it was a Hidro Viao
-     * @param destroyed If the ship was destroyed in this shot, this should be true
+     * @param destroyed If the ship was destroyed in this shot, this should be
+     * true
      */
-    public void updateProbs(Square[][] showGrid, Square sqs, boolean destroyed){
-        if(destroyed){ //Back to normal firing mode, but before that, mark all squares around AND the ship sunk with 0 weight 
+    public void updateProbs(Square[][] showGrid, Square sqs, boolean destroyed) {
+        if (destroyed) { //Back to normal firing mode, but before that, mark all squares around AND the ship sunk with 0 weight 
             markGridZero(showGrid, sqs);
-        }
-        else{
-            switch(sqs.getState()){
-                case HIT_SUB:
-                    break;
-                case HIT_HID:
-                    break;
-                case HIT_CRU:
-                    break;
-                case HIT_DES:
-                    break;
-                case HIT_PP:
+        } else {
+            ArrayList<Square> neighbors = vizinhos(sqs, true);
+            switch (sqs.getState()) {
+                case HIT_HID: //special case
                     break;
                 case WATER: //Hit water: Reduce weight in cardinal directions from this square
-                    for(int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 10; i++) {
                         showGrid[i][sqs.getColumnIndex()].incrementWeight(-0.1);
                     }
-                    for(int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 10; i++) {
                         showGrid[sqs.getRowIndex()][i].incrementWeight(-0.1);
                     }
                     break;
+                default: // it's not a hidro viao, nor water nor a submarine (because submarines are always fully destroyed)
+                    for (Square nei : neighbors) {
+                        if (nei.getWeight() != 0) {
+                            nei.setWeight(2);
+                        }
+                    }
             }
             sqs.setWeight(0);
         }
     }
 
     /**
-     * Makes a shot, depending on the square that have the best probability of having a ship
+     * Makes a shot, depending on the square that have the best probability of
+     * having a ship
+     *
      * @param fireGrid All possible firing squares (Currently unused)
      * @param showGrid The grid itself
      */
-    public void shotHunt(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid){
+    public void shotHunt(ArrayList<ArrayList<Square>> fireGrid, Square[][] showGrid) {
         ArrayList<Square> probs = new ArrayList<>();
         double maxProb = 0;
         int randShot = 0;
-        Square selectedSquare = null;
-        for(int i = 0; i < 10; i++){
-            for(int j = 0; j < 10; j++){
-                if(showGrid[i][j].getWeight() > maxProb){
+        Square selectedSquare;
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (showGrid[i][j].getWeight() > maxProb) {
                     maxProb = showGrid[i][j].getWeight();
                 }
             }
         }
-        for(int i = 0; i < 10; i++){
-            for(int j = 0; j < 10; j++){
-                if(showGrid[i][j].getWeight() == maxProb){
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (showGrid[i][j].getWeight() == maxProb) {
                     probs.add(showGrid[i][j]);
                 }
             }
         }
-        if(probs.size() > 1){
-            randShot = (int)(Math.random() * (probs.size() - 1));
+        if (probs.size() > 1) {
+            randShot = (int) (Math.random() * (probs.size() - 1));
         }
         selectedSquare = probs.get(randShot);
         //W - Water
@@ -182,39 +185,45 @@ public class Tabuleiro {
         // !! SE TIVER 'T' NO FINAL: Totalmente destruido !!
         System.out.println("Shotting at " + selectedSquare.getRow() + selectedSquare.getColumn() + "\nResponse[W/C/D/H/S/P]:");
         String in = reader.nextLine();
-        switch(in.charAt(0)) {
+        switch (in.charAt(0)) {
             case 'W':
                 selectedSquare.setState(Square.SquareState.WATER);
+                selectedSquare.setWeight(0);
                 break;
             case 'C':
                 selectedSquare.setState(Square.SquareState.HIT_CRU);
+                navioCacado.add(selectedSquare);
                 break;
             case 'D':
                 selectedSquare.setState(Square.SquareState.HIT_DES);
+                navioCacado.add(selectedSquare);
                 break;
             case 'H':
                 selectedSquare.setState(Square.SquareState.HIT_HID);
+                navioCacado.add(selectedSquare);
                 break;
             case 'S':
                 selectedSquare.setState(Square.SquareState.HIT_SUB);
+                navioCacado.add(selectedSquare);
                 break;
             case 'P':
                 selectedSquare.setState(Square.SquareState.HIT_PP);
+                navioCacado.add(selectedSquare);
                 break;
         }
-        if(in.charAt(1) == 'T') {
+        if (in.charAt(1) == 'T') {
             //TODO: Codigo para remover da lista o navio em 'selectedSquare'
             updateProbs(showGrid, selectedSquare, true);
-        }
-        else {
+        } else {
             updateProbs(showGrid, selectedSquare, false);
         }
-        
+
         fireGrid.get(selectedSquare.getRowIndex()).remove(selectedSquare.getColumnIndex());
         if (fireGrid.get(selectedSquare.getRowIndex()).isEmpty()) {
             fireGrid.remove(selectedSquare.getRowIndex());
         }
     }
+
     /**
      * Generates a random position to shoot and as soon as we upgrade it, it
      * will be able to hunt a ship given an initial hit square
@@ -240,7 +249,6 @@ public class Tabuleiro {
     /**
      * Prints the grid passed as parameter
      *
-     * @param grid The grid itself
      */
     public void printMatriz() {
         for (int i = 0; i < 10; i++) {

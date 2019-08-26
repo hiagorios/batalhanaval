@@ -170,4 +170,35 @@ public class Square {
                 break;
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + this.m_column;
+        hash = 23 * hash + this.m_row;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Square other = (Square) obj;
+        if (this.m_column != other.m_column) {
+            return false;
+        }
+        if (this.m_row != other.m_row) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }
