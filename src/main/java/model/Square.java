@@ -153,19 +153,19 @@ public class Square {
     
     // !! NO PROTECTION! ONLY CALL THOSE ON SHIP HITS !!
     public boolean isSquareUnder(Square s){
-        return getColumnIndex() == (s.getColumnIndex() - 1);
+        return getRowIndex() == (s.getRowIndex() + 1);
     }
     
     public boolean isSquareOver(Square s){
-        return getColumnIndex() == (s.getColumnIndex() + 1);
+        return getRowIndex() == (s.getRowIndex() - 1);
     }
     
     public boolean isSquareLeft(Square s){
-        return getRowIndex() == (s.getRowIndex() + 1);
+        return getColumnIndex() == (s.getColumnIndex() + 1);
     }
     
     public boolean isSquareRight(Square s){
-        return getRowIndex() == (s.getRowIndex() + 1);
+        return getColumnIndex() == (s.getColumnIndex() - 1);
     }
     
     public boolean isSquareTL(Square s){

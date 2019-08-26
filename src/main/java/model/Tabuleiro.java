@@ -249,7 +249,7 @@ public class Tabuleiro {
                     break;
                 default:        //It's not a hidro viao, nor water nor a submarine (because submarines are always fully destroyed)
                     if(navioCacado.size() >= 1){ //If size is greater or equal to 1, we can assume it's orientation
-                        int dex = navioCacado.size() - 1;
+                        int dex = navioCacado.size() > 1 ? navioCacado.size() - 2 : navioCacado.size() - 1;
                         Square lastHit = navioCacado.get(dex);
                         //Check where the last ship was in relation to 'sqs'
                         if(lastHit.isSquareOver(sqs) || lastHit.isSquareUnder(sqs)){
@@ -263,7 +263,7 @@ public class Tabuleiro {
                                 setSquareRight(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
                             }
                         }
-                        else {
+                        else if(lastHit.isSquareLeft(sqs) || lastHit.isSquareRight(sqs)){
                             sqs.setOrient(Square.ShipOrient.HORI);
                             setSquareTop(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
                             setSquareBottom(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
