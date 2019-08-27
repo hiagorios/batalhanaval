@@ -153,11 +153,11 @@ public class Square {
     
     // !! NO PROTECTION! ONLY CALL THOSE ON SHIP HITS !!
     public boolean isSquareUnder(Square s){
-        return getRowIndex() == (s.getRowIndex() + 1);
+        return getRowIndex() == (s.getRowIndex() - 1);
     }
     
     public boolean isSquareOver(Square s){
-        return getRowIndex() == (s.getRowIndex() - 1);
+        return getRowIndex() == (s.getRowIndex() + 1);
     }
     
     public boolean isSquareLeft(Square s){
@@ -210,7 +210,7 @@ public class Square {
     
     //Bottom Right
     public boolean haveDiagonalBR() {
-        if(isCornerTop() || isCornerRight()){
+        if(isCornerBottom() || isCornerRight()){
             return false;
         }
         return true;
@@ -244,29 +244,30 @@ public class Square {
         System.out.printf("%c%c", m_row, m_column);
         switch (m_state){
             case WATER:
-                System.out.printf("[WWWW]");
+                System.out.printf("[----]");
                 break;
             case HIT_DES:
                 System.out.printf("[DDDD]");
                 break;
             case HIT_HID:
-                System.out.printf("[HIDR]");
+                System.out.printf("[HHHH]");
                 break;
             case HIT_CRU:
-                System.out.printf("[CRUZ]");
+                System.out.printf("[CCCC]");
                 break;
             case HIT_SUB:
-                System.out.printf("[SUBM]");
+                System.out.printf("[SSSS]");
                 break;
             case HIT_PP:
-                System.out.printf("[PPAA]");
+                System.out.printf("[PPPP]");
                 break;
             case IMP:
-                System.out.printf("[****]");
+                System.out.printf("[*]");
                 break;
             case BLANK:
             default:
                 System.out.printf("[%.2f]", m_weight);
+                //System.out.printf("[ ]");
                 break;
         }
     }

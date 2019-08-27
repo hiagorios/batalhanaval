@@ -69,7 +69,7 @@ public class Tabuleiro {
     
     
     public void setSquareLeft(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-        if(!tgt.isCornerLeft() && tgt.getWeight() != 0){
+        if(!tgt.isCornerLeft()){
             matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setState(state);
             matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setOrient(orient);
             matriz[tgt.getRowIndex()][tgt.getIndexLeft()].setWeight(weight);
@@ -77,7 +77,7 @@ public class Tabuleiro {
     }
     
     public void setSquareRight(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-        if(!tgt.isCornerRight() && tgt.getWeight() != 0){
+        if(!tgt.isCornerRight()){
             matriz[tgt.getRowIndex()][tgt.getIndexRight()].setState(state);
             matriz[tgt.getRowIndex()][tgt.getIndexRight()].setOrient(orient);
             matriz[tgt.getRowIndex()][tgt.getIndexRight()].setWeight(weight);
@@ -85,7 +85,7 @@ public class Tabuleiro {
     }
     
     public void setSquareTop(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-        if(!tgt.isCornerTop() && tgt.getWeight() != 0){
+        if(!tgt.isCornerTop()){
             matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setState(state);
             matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setOrient(orient);
             matriz[tgt.getIndexTop()][tgt.getColumnIndex()].setWeight(weight);
@@ -93,7 +93,7 @@ public class Tabuleiro {
     }
     
     public void setSquareBottom(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-        if(!tgt.isCornerBottom() && tgt.getWeight() != 0){
+        if(!tgt.isCornerBottom()){
             matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setState(state);
             matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setOrient(orient);
             matriz[tgt.getIndexBottom()][tgt.getColumnIndex()].setWeight(weight);
@@ -101,7 +101,7 @@ public class Tabuleiro {
     }
     
     public void setSquareTL(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-        if(tgt.haveDiagonalTL() && tgt.getWeight() != 0){
+        if(tgt.haveDiagonalTL()){
             matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setState(state);
             matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setOrient(orient);
             matriz[tgt.getIndexTop()][tgt.getIndexLeft()].setWeight(weight);
@@ -109,7 +109,7 @@ public class Tabuleiro {
     }
     
     public void setSquareTR(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-         if(tgt.haveDiagonalTR() && tgt.getWeight() != 0){
+         if(tgt.haveDiagonalTR()){
             matriz[tgt.getIndexTop()][tgt.getIndexRight()].setState(state);
             matriz[tgt.getIndexTop()][tgt.getIndexRight()].setOrient(orient);
             matriz[tgt.getIndexTop()][tgt.getIndexRight()].setWeight(weight);
@@ -117,7 +117,7 @@ public class Tabuleiro {
     }
     
     public void setSquareBL(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-         if(tgt.haveDiagonalBL() && tgt.getWeight() != 0){
+         if(tgt.haveDiagonalBL()){
             matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setState(state);
             matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setOrient(orient);
             matriz[tgt.getIndexBottom()][tgt.getIndexLeft()].setWeight(weight);
@@ -125,7 +125,7 @@ public class Tabuleiro {
     }
     
     public void setSquareBR(Square tgt, Square.SquareState state, Square.ShipOrient orient, double weight){
-         if(tgt.haveDiagonalBR() && tgt.getWeight() != 0){
+         if(tgt.haveDiagonalBR()){
             matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setState(state);
             matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setOrient(orient);
             matriz[tgt.getIndexBottom()][tgt.getIndexRight()].setWeight(weight);
@@ -332,35 +332,41 @@ public class Tabuleiro {
         //S - Submaniro
         //P - Porta Avioes
         // !! SE TIVER 'T' NO FINAL: Totalmente destruido !!
-        System.out.println("Shotting at " + selectedSquare.getRow() + selectedSquare.getColumn() + "\nResponse[W/C/D/H/S/P]:");
+        System.out.println("Shooting at " + selectedSquare.getRow() + selectedSquare.getColumn() + "\nResponse[(W)ater/(C)ruzer/(D)est./(H)idro-Viao/(S)ub/(P)orta Piao/<T>otal]:");
         String in = reader.nextLine();
         switch (in.charAt(0)) {
             case 'W':
+            case 'w':
                 selectedSquare.setState(Square.SquareState.WATER);
                 selectedSquare.setWeight(0);
                 break;
             case 'C':
+            case 'c':
                 selectedSquare.setState(Square.SquareState.HIT_CRU);
                 navioCacado.add(selectedSquare);
                 break;
             case 'D':
+            case 'd':
                 selectedSquare.setState(Square.SquareState.HIT_DES);
                 navioCacado.add(selectedSquare);
                 break;
             case 'H':
+            case 'h':
                 selectedSquare.setState(Square.SquareState.HIT_HID);
                 navioCacado.add(selectedSquare);
                 break;
             case 'S':
+            case 's':
                 selectedSquare.setState(Square.SquareState.HIT_SUB);
                 navioCacado.add(selectedSquare);
                 break;
             case 'P':
+            case 'p':
                 selectedSquare.setState(Square.SquareState.HIT_PP);
                 navioCacado.add(selectedSquare);
                 break;
         }
-        if (in.length() > 1 && in.charAt(1) == 'T') {
+        if (in.length() > 1 && (in.charAt(1) == 'T' || in.charAt(1) == 't')) {
             //TODO: Codigo para remover da lista o navio em 'selectedSquare'
             updateProbs(showGrid, selectedSquare, true);
         } else {
