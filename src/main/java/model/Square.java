@@ -247,22 +247,22 @@ public class Square {
                 System.out.printf("[----]");
                 break;
             case HIT_DES:
-                System.out.printf("[DDDD]");
+                System.out.printf("[DEST]");
                 break;
             case HIT_HID:
-                System.out.printf("[HHHH]");
+                System.out.printf("[HIDR]");
                 break;
             case HIT_CRU:
-                System.out.printf("[CCCC]");
+                System.out.printf("[CRUZ]");
                 break;
             case HIT_SUB:
-                System.out.printf("[SSSS]");
+                System.out.printf("[SUBM]");
                 break;
             case HIT_PP:
-                System.out.printf("[PPPP]");
+                System.out.printf("[PORT]");
                 break;
             case IMP:
-                System.out.printf("[*]");
+                System.out.printf("[****]");
                 break;
             case BLANK:
             default:

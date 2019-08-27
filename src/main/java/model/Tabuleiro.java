@@ -226,6 +226,37 @@ public class Tabuleiro {
             ArrayList<Square> neighbors = vizinhos(sqs, true);
             switch (sqs.getState()) {
                 case HIT_HID:   //Special case
+                    if(navioCacado.size() == 2){
+                        Square lastHit = navioCacado.get(0);
+                        //  SQS
+                        //      LH
+                        if(sqs.isSquareBR(lastHit)){
+                            if(sqs.haveDiagonalTL()){   //If we can't assume this, at least mark TL as water
+                                matriz[sqs.getIndexTop()][sqs.getIndexLeft()].setState(Square.SquareState.WATER);
+                            }
+                        }
+                        //   SQS
+                        //LH      
+                        else if(sqs.isSquareBL(lastHit)){
+                            if(sqs.haveDiagonalTR()){
+                                matriz[sqs.getIndexTop()][sqs.getIndexRight()].setState(Square.SquareState.WATER);
+                            }
+                        }
+                        //LH
+                        //   SQS
+                        else if(sqs.isSquareTL(lastHit)){
+                            if(sqs.haveDiagonalBR()){
+                                matriz[sqs.getIndexBottom()][sqs.getIndexRight()].setState(Square.SquareState.WATER);
+                            }
+                        }
+                        //       LH
+                        //   SQS
+                        else{
+                            if(sqs.haveDiagonalBL()){
+                                matriz[sqs.getIndexBottom()][sqs.getIndexLeft()].setState(Square.SquareState.WATER);
+                            }
+                        }
+                    }
                     if(sqs.haveDiagonalBL()){
                         showGrid[sqs.getIndexBottom()][sqs.getIndexLeft()].setWeight(2);
                     }
@@ -258,19 +289,19 @@ public class Tabuleiro {
                             setSquareLeft(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
                             setSquareRight(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
                             //If size is one, we need to fix our first wrong guess
-                            if(navioCacado.size() == 1){
-                                setSquareLeft(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
-                                setSquareRight(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
-                            }
+//                            if(navioCacado.size() == 1){
+//                                setSquareLeft(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+//                                setSquareRight(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+//                            }
                         }
                         else if(lastHit.isSquareLeft(sqs) || lastHit.isSquareRight(sqs)){
                             sqs.setOrient(Square.ShipOrient.HORI);
                             setSquareTop(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
                             setSquareBottom(sqs, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
-                            if(navioCacado.size() == 1){
-                                setSquareTop(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
-                                setSquareBottom(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
-                            }
+//                            if(navioCacado.size() == 1){
+//                                setSquareTop(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+//                                setSquareBottom(lastHit, Square.SquareState.WATER, Square.ShipOrient.UNKW, 0);
+//                            }
                         }
                     }
                     if(sqs.getOrient() == Square.ShipOrient.VERT || sqs.getOrient() == Square.ShipOrient.UNKW) {
